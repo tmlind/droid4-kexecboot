@@ -1,0 +1,105 @@
+Kexecboot based bootloader images for droid 4
+
+These images can be flashed to the 4MB mmcblk1p13 "bpsw" on droid 4 eMMC for a
+kexec based bootloader. We can now configure the stock bootloader to boot to
+mmcblk1p13 partition using utagboot bootloader configurator. And then we can
+use kexecboot for a GUI to boot a newer kernel to the selected distro.
+
+
+INSTALL
+
+To install, use fastboot to unlock the utags and bpsw partition. Then flash
+current droid4-kexecboot image and utags to boot to it:
+
+$ fastboot flash mbm allow-mbmloader-flashing-mbm.bin
+$ fastboot flash bpsw current/droid4-kexecboot.img
+$ fastboot flash utags utags-mmcblk1p13.bin
+
+And then you may want to lock the utags and bpsw partitions later on after
+things are working again with:
+
+$ fastboot flash mbm mbm.bin
+
+You can get the mbm.bin from the droid 4 stock kernel firmware. And you should
+have droid 4 updated to VRZ_XT894_9.8.2O-72_VZW-18-8_CFC version first.
+
+And then you have to configure kexecboot, see CONFIGURATION below.
+
+
+UNINSTALL
+
+$ fastboot flash mbm allow-mbmloader-flashing-mbm.bin
+$ fastboot erase utags
+$ fastboot flash mbm mbm.bin
+
+
+CONFIGURATION
+
+Kexecboot will try to mount all usable partitions and look for boot/boot.cfg
+file on them. So you could have the following boot.cfg on mmcblk0p1:
+
+LABEL=Linux on mmcblk0p1 FlashAir
+PRIORITY=9
+DTB=/omap4-droid4-xt894.dtb
+KERNEL=/vmlinuz
+CMDLINE=console=tty0 console=ttyS2,115200 fbcon=rotate:1 debug earlycon ro \
+rootwait rootfstype=ext4 root=/dev/mmcblk0p1
+TIMEOUT=3
+
+Note that the boot partition must be unmounted or else kexecboot will not try
+to use it. See kexecboot documentation for more information on boot.cfg file:
+
+https://github.com/kexecboot/kexecboot/blob/master/res/boot.cfg
+
+
+BUILDING FROM SOURCES
+
+Use the buildroot git tree for most recent droid4 work branch at:
+
+https://github.com/tmlind/buildroot
+
+Then just do:
+
+$ git checkout droid4-kexecboot-2017.11
+$ make droid4_kexecboot_defconfig
+$ make
+...
+$ sudo dd if=/dev/zero of=/tmp/boot.img bs=1M count=4
+$ sudo mkfs.ext2 /tmp/boot.img
+$ sudo mount -o loop /tmp/boot.img /mnt
+$ sudo tar xf output/images/rootfs.tar -C /mnt
+$ sudo umount /mnt
+
+And then you should be able to flash /tmp/boot.img to mmcblk1p13 bpsw
+partition on droid 4 as described in INSTALL above. The binary for
+utags-mmcblk1p13.bin is generated with utagboot at:
+
+https://github.com/tmlind/utagboot
+
+And probably does not need to be changed unless you want some custom
+kernel cmdline options for the stock kernel when booting to buildroot.
+
+
+DEVELOPER ACCESS VIA SERIAL PORT
+
+You can build a USB to serial adapter for droid 4 using the instructions at:
+
+http://muru.com/linux/d4/
+
+And then you need to configure droid4-kexecboot image to set proper user and
+password or at least a root password. Or rebuild the image with Kconfig option
+BR2_TARGET_ENABLE_ROOT_LOGIN enabled.
+
+
+KNOWN ISSUES
+
+Current v3.0.8 based Android images depend on SafeStrap configuration being on
+mmcblk1p25 vfat partition. If somebody fixes the Android images for their
+initramfs to use the root partition based on kernel command line, we should be
+able to also boot Android images. And then mmcblk1p25 can be formatted as ext4
+and is usable for distros.
+
+Note that the stock v3.0.8 kernel does not seem to survive kexec boot at all.
+We could maybe add support for booting to the stock kernel by setting up a
+wrapper script for /sbin/init that just does pivot_root to the stock image
+if "s" is pressed on boot.
