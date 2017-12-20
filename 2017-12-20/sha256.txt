@@ -1,0 +1,2 @@
+8dd836cb8185a47f530265f06c9f991de87432c3e952e58c8de42ecd72e91ea4  droid4-kexecboot.img
+d460f4ade8d3d3293f591ee76ecad057a81623c2a9d78d5cb39348811fcdc64d  droid4-kexecboot.tar.xz
