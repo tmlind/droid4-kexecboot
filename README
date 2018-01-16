@@ -38,13 +38,24 @@ CONFIGURATION
 Kexecboot will try to mount all usable partitions and look for boot/boot.cfg
 file on them. So you could have the following boot.cfg on mmcblk0p1:
 
-LABEL=Linux on mmcblk0p1 FlashAir
+LABEL=SafeStrap rom-slot1
+PRIORITY=10
+DTB=/boot/rom-slot1/devtree
+KERNEL=/boot/rom-slot1/kernel
+INITRD=/boot/rom-slot1/ramdisk.img
+CMDLINE="androidboot.safestrap.romslot=rom-slot1"
+TIMEOUT=3
+
+LABEL=Linux on mmcblk0p1
 PRIORITY=9
-DTB=/omap4-droid4-xt894.dtb
-KERNEL=/vmlinuz
+DTB=/boot/mainline/omap4-droid4-xt894.dtb
+KERNEL=/boot/mainline/vmlinuz
 CMDLINE=console=tty0 console=ttyS2,115200 fbcon=rotate:1 debug earlycon ro \
 rootwait rootfstype=ext4 root=/dev/mmcblk0p1
 TIMEOUT=3
+
+Note that the "stock" rom is not kexec bootable so there is currently no
+support for it and you're limited to using SafeStrap.
 
 Note that the boot partition must be unmounted or else kexecboot will not try
 to use it. See kexecboot documentation for more information on boot.cfg file:
