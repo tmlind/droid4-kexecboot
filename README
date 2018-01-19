@@ -46,8 +46,16 @@ INITRD=/boot/rom-slot1/ramdisk.img
 CMDLINE="androidboot.safestrap.romslot=rom-slot1"
 TIMEOUT=3
 
-LABEL=Linux on mmcblk0p1
+LABEL=SafeStrap rom-slot2
 PRIORITY=9
+DTB=/boot/rom-slot2/devtree
+KERNEL=/boot/rom-slot2/kernel
+INITRD=/boot/rom-slot2/ramdisk.img
+CMDLINE="androidboot.safestrap.romslot=rom-slot2"
+TIMEOUT=3
+
+LABEL=Linux on mmcblk0p1
+PRIORITY=8
 DTB=/boot/mainline/omap4-droid4-xt894.dtb
 KERNEL=/boot/mainline/vmlinuz
 CMDLINE=console=tty0 console=ttyS2,115200 fbcon=rotate:1 debug earlycon ro \
@@ -55,7 +63,9 @@ rootwait rootfstype=ext4 root=/dev/mmcblk0p1
 TIMEOUT=3
 
 Note that the "stock" rom is not kexec bootable so there is currently no
-support for it and you're limited to using SafeStrap.
+support for it and you're limited to using SafeStrap to create images etc.
+Currently you must temporarily clear the utags partition to boot to
+the stock rom and SafeStrap.
 
 Note that the boot partition must be unmounted or else kexecboot will not try
 to use it. See kexecboot documentation for more information on boot.cfg file:
