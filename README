@@ -62,6 +62,11 @@ CMDLINE=console=tty0 console=ttyS2,115200 fbcon=rotate:1 debug earlycon ro \
 rootwait rootfstype=ext4 root=/dev/mmcblk0p1
 TIMEOUT=3
 
+For booting v3.0.8 legacy kernels, also SafeStrap atags file is needed in
+the same directory with devtree file above. It can be found on the device
+in /system/etc/kexec/atags and should be the same for all v3.0.8 based
+kernels.
+
 Note that the "stock" rom is not kexec bootable so there is currently no
 support for it and you're limited to using SafeStrap to create images etc.
 Currently you must temporarily clear the utags partition to boot to
