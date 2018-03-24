@@ -3,7 +3,8 @@ Kexecboot based bootloader images for droid 4
 These images can be flashed to the 4MB mmcblk1p13 "bpsw" on droid 4 eMMC for a
 kexec based bootloader. We can now configure the stock bootloader to boot to
 mmcblk1p13 partition using utagboot bootloader configurator. And then we can
-use kexecboot for a GUI to boot a newer kernel to the selected distro.
+use kexecboot for a GUI to boot a newer kernel to the selected distro. We can
+now also boot to the stock Android and SafeStrap using pivot_root.
 
 
 INSTALL
@@ -38,7 +39,10 @@ $ fastboot flash mbm mbm.bin
 CONFIGURATION
 
 Kexecboot will try to mount all usable partitions and look for boot/boot.cfg
-file on them. So you could have the following boot.cfg on mmcblk0p1:
+file on them. The stock Android distro is the only one configured by default,
+and then you can add addtional boot.cfg files.
+
+So you could have the following boot.cfg on mmcblk0p1:
 
 LABEL=SafeStrap rom-slot1
 PRIORITY=10
@@ -64,18 +68,18 @@ CMDLINE=console=tty0 console=ttyS2,115200 fbcon=rotate:1 debug earlycon ro \
 rootwait rootfstype=ext4 root=/dev/mmcblk0p1
 TIMEOUT=3
 
+Note that there is currently nothing updating the kernels extracted from
+rom slots if those kernels get updated and you have to update the kernels
+manually.
+
 For booting v3.0.8 legacy kernels, also SafeStrap atags file is needed in
 the same directory with devtree file above. It can be found on the device
 in /system/etc/kexec/atags and should be the same for all v3.0.8 based
 kernels.
 
-Note that the "stock" rom is not kexec bootable so there is currently no
-support for it and you're limited to using SafeStrap to create images etc.
-Currently you must temporarily clear the utags partition to boot to
-the stock rom and SafeStrap.
-
-Note that the boot partition must be unmounted or else kexecboot will not try
-to use it. See kexecboot documentation for more information on boot.cfg file:
+And please note that any partition kexecboot tries to use must be unmounted
+or else kexecboot can't use it. See kexecboot documentation for more
+information on boot.cfg file:
 
 https://github.com/kexecboot/kexecboot/blob/master/res/boot.cfg
 
@@ -128,6 +132,5 @@ able to also boot Android images. And then mmcblk1p25 can be formatted as ext4
 and is usable for distros.
 
 Note that the stock v3.0.8 kernel does not seem to survive kexec boot at all.
-We could maybe add support for booting to the stock kernel by setting up a
-wrapper script for /sbin/init that just does pivot_root to the stock image
-if "s" is pressed on boot.
+To boot to the stock v3.0.8 kernel, we start kexecboot as pid 1 so we can
+pivot_root to the stock Android distro if selected in kexecboot.
