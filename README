@@ -42,7 +42,15 @@ Kexecboot will try to mount all usable partitions and look for boot/boot.cfg
 file on them. The stock Android distro is the only one configured by default,
 and then you can add addtional boot.cfg files.
 
-So you could have the following boot.cfg on mmcblk0p1:
+Note that the v3.0.8 stock kernel cannot read ext4 partitions formatted on
+newer kernels unless metadata_csum flag is left out. So if formatting the
+MMC card on your Linux PC, just do it with:
+
+# mkfs.ext4 -O^metadata_csum ...
+
+You can have boot/boot.cfg and your Linux ARM distro on the same partition
+that way, or set up a separate boot partition. Assuming you have boot.cfg
+on mmcblk0p1, you should have something like this listed in boot.cfg:
 
 LABEL=SafeStrap rom-slot1
 PRIORITY=10
