@@ -46,7 +46,7 @@ Note that the v3.0.8 stock kernel cannot read ext4 partitions formatted on
 newer kernels unless metadata_csum flag is left out. So if formatting the
 MMC card on your Linux PC, just do it with:
 
-# mkfs.ext4 -O^metadata_csum ...
+# mkfs.ext4 -O^metadata_csum,^64bit ...
 
 You can have boot/boot.cfg and your Linux ARM distro on the same partition
 that way, or set up a separate boot partition. Assuming you have boot.cfg
