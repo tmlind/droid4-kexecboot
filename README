@@ -76,6 +76,13 @@ CMDLINE=console=tty0 console=ttyS2,115200 fbcon=rotate:1 debug earlycon ro \
 rootwait rootfstype=ext4 root=/dev/mmcblk0p1
 TIMEOUT=3
 
+LABEL=SafeStrap recovery
+PRIORITY=1
+DTB=/boot/safestrap/kexec/devtree
+KERNEL=/boot/safestrap/kexec/kernel
+INITRD=/boot/safestrap/ramdisk-recovery.img
+CMDLINE="androidboot.safestrap=recovery"
+
 Note that there is currently nothing updating the kernels extracted from
 rom slots if those kernels get updated and you have to update the kernels
 manually.
@@ -90,6 +97,19 @@ or else kexecboot can't use it. See kexecboot documentation for more
 information on boot.cfg file:
 
 https://github.com/kexecboot/kexecboot/blob/master/res/boot.cfg
+
+To kexec boot to SafeStrap from droid4-kexecboot, you can just extract
+the files from Safestrap-maserati-v3.75.apk into your boot directory
+and use the above boot.cfg configuration for "SafeStrap recovery". To
+extract the Safestrap-maserati-v3.75.apk files you can do:
+
+$ mkdir -p boot/safestrap
+$ cd boot/safestrap
+$ mkdir tmp
+$ unzip -d tmp /tmp/Safestrap-maserati-v3.75.apk
+$ unzip -d tmp tmp/assets/install-files.zip
+$ mv tmp/install-files/etc/safestrap/* .
+$ rm -rf tmp
 
 
 BUILDING FROM SOURCES
