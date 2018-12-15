@@ -1,0 +1,114 @@
+Partition considerations for droid4-kexecboot
+
+Because the bootloader is locked on droid 4, most eMMC partitions cannot
+be used and contain signed images checked by the Motorola bootloader.
+
+Overwriting the the Motorola bootloader partitions on the eMMC will result
+in a bricked device, so be cafeful. Below we only consider partitions
+that are known to be recoverable with fastboot and a USB cable.
+
+Also the micro-SD card formatting has few considerations, so please read
+this document before install.
+
+
+1. Bootloader reserved eMMC partitions on droid 4
+
+The following eMMC partitions are reserved for droid4-kexecboot use:
+
+NAME		PARTITION	NOTES
+mmcblk1p8	utags		512K device specific custom tags
+mmcblk1p9	logo.bin	2M log partition, can be changed
+mmcblk1p23	bpsw		4M empty, droid4-kexecboot rootfs
+mmcblk1p22	preinstall	608M ext3 tutorials, usable as auxdata
+
+The utags and bpsw partitions are always used by droid4-kexecboot
+where the utags partition configures the stock kernel to boot to the
+droid4-kexecboot rootfs on the bpsw partition.
+
+The logo partition image is shown by the Motorola bootloader that runs
+when the device is powered on, and can be modified.
+
+The preinstall partition is optionally needed by droid4-kexecboot for
+SafeStrap recovery image, and stock WLAN modules as the bpsw partition is
+too small, and the mmcblk1p20 system partition may have an updated Android
+image such as LineageOS 14.1 installed on it. As the SafeStrap recovery
+and the stock kernel WLAN modules only take some of the available space
+for the mmcblk1p22 preinstall partition, it can also be shared with Linux
+distros as needed. The droid4-kexecboot only needs to place data into
+directories lib/modules and boot on the mmcblk1p22 preinstall partition.
+
+The suggested formatting for mmcblk1p22 preinstall is ext4 using flags
+mkfs.ext4 -O^metadata_csum,^64bit so it's readable also for the stock
+Android kernel used by droid4-kexecboot.
+
+
+2. Available eMMC partitions for custom use
+
+The following partitions are available for custom Android or Linux
+distro installs:
+
+NAME		PARTITION	NOTES
+mmcblk1p20	system		640M ext3, stock Android system
+mmcblk1p23	webtop		1.3G ext3 webtop
+mmcblk1p25	emstorage	8G vfat /sdcard
+
+Updated Android such as LineageOS 14.1 can be installed over the old
+stock Android install to mmcblk1p20 system partition as long as the
+partition format stays as ext3. Note that mmcblk1p20 system is not big
+enough for LinageOS if gapps are installed. It works fine with LineageOS
+without gapps though.
+
+If gapps are needed, mmcblk1p23 webtop can be used for LineageOS with
+gapps as it's bigger than the mmcblk1p20 system partition. For using
+the mmcblk1p23 webtop for LineageOS, it needs to be formatted as ext3.
+
+If using mmcblk1p23 webtop partition as the Android "altpart" system
+partition, it needs to be formatted as ext3 currently as specified in
+the initramfs fstab.mapphone_cdma file for /system.
+
+If gapps are not needed, mmcblk1p23 webtop can be formatted as ext4 for
+Linux distro use. Note that if you want mmcblk1p23 webtop to be readable
+for Android installs, it needs to be formatted using options mkfs.ext4
+-O^metadata_csum,^64bit.
+
+Note that installing Android to both mmcblk1p20 system and mmcblk1p23
+webtop does not seem to play along nicely for gapps at least because of
+the shared cache and data partitions.
+
+The mmcblk1p25 emstorage partition is typically used as vfat for Android
+installs. It can be optionally used also for Linux distros and reformatted
+as ext4. Some people might prefer to use mmcblk1p25 emstorage as Linux
+rootfs as it has 8 data lines connected instead of 4 compared to micro-SD
+cards making it potentially faster. And it allows using the micro-SD
+card as a hot pluggable device.
+
+Note that reformatting mmcblk1p25 emstorage as ext4 might cause some
+issues for the Android installs. If you want Android to be able to access
+mmcblk1p25 emstorage partition, it needs to be formatted using options
+mkfs.ext4 -O^metadata_csum,^64bit. If you want to have Android be able
+to use mmcblk1p25 emstorage, it needs to have also the basic directory
+structure created for it as on the vfat formatted mmcblk1p25 emstorage.
+
+If uncertain, do not reformat mmcblk1p25 emstorage as ext4 and use Linux
+distros on the micro-SD card.
+
+For more information about installing LineageOS, see file INSTALL.
+
+
+3. Partition considerations for micro-SD cards
+
+The micro-SD card can have one or more partitions. For droid4-kexecboot to
+be able to configuration and the kernel to boot from the micro-SD card,
+it's partitions need to be formatted with flags suitable for the stock
+Kernel used by droid4-kexecboot.
+
+For partitions that you want to make readable for the stock Android
+kernel, please use options mkfs.ext4 -O^metadata_csum,^64bit. If you
+want to make the whole micro-SD card readable for Android, you need to
+format micro-SD card partition mmcblk0p1 with these options.
+
+If you prefer to have the Linux rootfs not readable for Android, you can
+create a separate boot partition mmcblk0p1 for 128MB and format it with
+mkfs.ext4 -O^metadata_csum,^64bit and place boot directory with kernel
+files there. And then create mmcblk0p2 and possibly other partitions
+too as desired for the Linux distro to use.
