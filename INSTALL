@@ -23,10 +23,15 @@ micro-SD card
 VRZ_XT894_9.8.2O-72_VZW-18-8_CFC.xml.zip
 sha256 bdc2e452825ee8d339c736121f6019845f2e9984afdbbebe642bba0b0f3ef175
 
-Safestrap-maserati-v3.75-altpart.apk
-sha256 5754220217cfe517b03ace67fbcf915bba4324f633c7fb1c6e4af6b96e1c835e
+Safestrap-maserati-v3.75-altpart.tar.gz
+sha256 caa9098f407e67f0cf4603313cdd476a761b436dd5a236d67cf741b762ad93ef
+From: https://github.com/timangus/droid4
 
-And you probably also want to get the current LineageOS addonsu zip file.
+And you probably also want to get the current LineageOS addonsu zip file:
+
+addonsu-14.1-arm-signed.zip
+sha256 1c0953b2eb3c5d2e88eeb7df4d60709aeb18e8acf56fb380ce83f5acb3dcbb8f
+From: https://download.lineageos.org/extras
 
 Optionally you may also want to get the current open_gapps pico zip file
 if you need gapps.
@@ -71,6 +76,8 @@ Start with installing SafeStrap recovery to a micro-SD card that we can
 then copy to the eMMC to the mmcblk1p22 preinstall partition. The recovery
 is needed for installing components with adb sideload, such as addonsu and
 gapps if needed. It is also needed to install LineageOS updates later on.
+After the SafeStrap recovery is installed to mmcblk1p22 preinstall partition,
+it's not necessary to keep it on the micro-SD card necessarily.
 
 Note that we cannot use the Motorola recovery because it does not support
 the LineageOS keys, and cannot be modified to add keys. And it does not
@@ -78,54 +85,48 @@ support the newer key format. And as the Motorola recovery is signed, we
 cannot install anything to that partition without cause in issues where
 the Motorola bootloader will only boot to fastboot mode.
 
-These instructions assume the use of Safestrap-maserati-v3.75-altpart.apk
-as that is needed if mmcblk1p23 webtop partition is used for LineageOS
-for gapps instead of mmcblk1p20 system partition without gapps.
-
 4.1 Extract SafeStrap files to the micro-SD card
 
-On your PC, Extract SafeStrap and install it to the micro-sd card:
+On your PC, Extract SafeStrap and install it to the micro-sd card into
+any partition for kexecboot to find it:
 
 $ sudo mkfs.ext4 -O^metadata_csum,^64bit /dev/microsd-partition
 $ sudo mount /dev/mcirosd-partition /mnt
-$ mkdir -p /mnt/boot/safestrap
-$ cd /mnt/boot/safestrap
-$ mkdir tmp
-$ unzip -d tmp /tmp/Safestrap-maserati-v3.75-altpart.apk
-$ unzip -d tmp tmp/assets/install-files.zip
-$ mv tmp/install-files/etc/safestrap/* .
-$ rm -rf tmp
+$ sudo tar zxf Safestrap-maserati-v3.75-altpart.tar.gz -C /mnt
+$ sudo umount /mnt
 
-4.2 Configure boot/boot.cfg on the micro-sd card for SafeStrap recovery
+4.2 Boot to SafeStrap recovery with kexecboot
 
-# cat > /mnt/system/boot/boot.cfg << EOF
-LABEL=SafeStrap recovery
-PRIORITY=1
-DTB=/boot/safestrap/kexec/devtree
-KERNEL=/boot/safestrap/kexec/kernel
-INITRD=/boot/safestrap/ramdisk-recovery.img
-CMDLINE="androidboot.safestrap=recovery"
-EOF
+Install the micro-SD card into the device and boot it up. You should see
+kexecboot menu with option "SafeStrap recovery". Select it with the up and
+down arrow keys and press enter to boot to recovery. After few seconds,
+SafeStrap recovery menu shows up on the device.
 
-5. Install LineageOS
+4.3 Copy SafeStrap recovery from micro-SD card to eMMC
 
-5.1 Boot device to SafeStrap rescue
-
-Boot to droid4-kexecboot and select "SafeStrap recovery" from the kexecboot
-menu to configure the device and install.
-
-Connect the device to your PC with a USB cable, and from the PC you should
-be able to connect to the device now with adb.
-
-5.2 Back-up the stock kernel WLAN modules for kexecboot
-
-Back up the stock kernel WLAN modules to the mmcblk1p22 preinstall
-partition if not already done. Note that the instructions below will wipe
-your mmcblk1p22 preinstall partition, so make a back-up first if you need
-to. Assuming you've made a back-up, then you can do:
+With device running in SafeStrap recovery, connect USB cable, and copy the
+recovery files from the micro-SD card to the mmcblk1p22 preinstall partition
+if not already done. Note that the following will wipe your mmcblk1p22
+preinstall partition, and if your're already using it for something other
+than the stock Android preinstall, make a back-up first. Assuming you're
+OK to wipe mmcblk1p22 preinstall partition, on your PC do:
 
 $ adb shell
 # mke2fs -T ext4 /dev/block/mmcblk1p22
+# mkdir /preinstall
+# mount /dev/block/mmcblk1p22 /preinstall
+# mkdir /microsd
+# mount /dev/block/mmcblk0p1 /microsd
+# cp -r /microsd/boot /preinstall/
+# umount /microsd
+# umount /preinstall
+
+4.4 Back-up the stock kernel WLAN modules for kexecboot
+
+With device running in SafeStrap recovery, back up the stock kernel WLAN
+modules to the mmcblk1p22 preinstall partition if not already done:
+
+$ adb shell
 # mkdir /preinstall
 # mount /dev/block/mmcblk1p22 /preinstall
 # mount /dev/block/mmcblk1p20 /system
@@ -134,22 +135,12 @@ $ adb shell
 # umount /system
 # umount /preinstall
 
-5.2 Copy SafeStrap recovery from micro-SD card to eMMC
+5. Install LineageOS
 
-Since the SafeStrap recovery will also be needed later on, it is a good
-idea to copy it to the mmcblk1p22 preinstall partition from the micro-SD
-card done in step 4.1 above:
+With device running SafeStrap recovery, you can now start LineageOS
+install.
 
-$ adb shell
-# mkdir /microsd
-# mount /dev/block/mmcblk0p1 /microsd
-# mkdir /preinstall
-# mount /dev/block/mmcblk1p22 /preinstall
-# cp -r /microsd/boot /preinstall/
-# umount /microsd
-# umount /preinstall
-
-5.3 Make sure mmcblk1p24 data partition is formatted
+5.1 Make sure mmcblk1p24 data partition is formatted
 
 If you have updated the system to the original distro but never booted
 it, it seems that the mmcblk1p24 userdata partition needs to be formatted
@@ -159,7 +150,7 @@ userdata on the device:
 
 # mkte2fs -T ext4 /dev/block/mmcblk1p24
 
-5.3 Optionally reformat mmcblk1p25 emstorage partition as ext4
+5.2 Optionally reformat mmcblk1p25 emstorage partition as ext4
 
 Based on your needs as described in the PARTITIONS file, optionally
 reformat mmcblk1p25 emstorage partition as ext4. This currently cannot
@@ -174,7 +165,7 @@ There is no need to use any special ext4 flags above as the SafeStrap
 recovery is using the stock v3.0.8 kernel that does not understand the
 newer flags.
 
-5.4 Configure mmcblk1p25 emstorage partition active_slot file
+5.3 Configure mmcblk1p25 emstorage partition active_slot file
 
 The mmcblk1p25 emstorage needs to be configured for LineageOS to use the
 right boot partition no matter if it's vfat or ext4 formatted:
@@ -189,13 +180,13 @@ system partition without gapps and for mmcblk1p23 webtop partition. Do
 not use "altpart" name above for active_slot, it will cause a blank screen
 on boot.
 
-5.5 Set the stock partition active in SafeStrap recovery
+5.4 Set the stock partition active in SafeStrap recovery
 
 On the device, select "Boot Options" -> "Stock ROM" -> "Activate" if not
 already active. After setting it, red "ROM SLot: stock" should display on
 the top of the screen
 
-5.6 Install LineageOS with adb sideload
+5.5 Install LineageOS with adb sideload
 
 On the device, select "Advanced" -> "ADB Sideload", check both options
 to wipe caches, then swipe to start sideload
@@ -209,7 +200,7 @@ at it after restarting sideload also on the device first:
 
 $ adb sideload addonsu-14.1-arm-signed.zip
 
-5.7 Configure kexecboot boot/boot.cfg file on the stock partition
+5.6 Configure kexecboot boot/boot.cfg file on the stock partition
 
 Note that you currently need to do this every time you update LineageOS
 on the mmcblk1p20 stock partition.
@@ -239,12 +230,12 @@ CMDLINE="androidboot.safestrap.romslot=altpart"
 TIMEOUT=3
 EOF
 
-5.8 Install optional gapps
+5.7 Install optional gapps
 
 You can install gapps pico zip file simlar to the addonsu file in 5.6 above.
 If installing gapps to mmcblk1p23 webtop partition after booting it,
 you need to do a "factory reset" on the device in SafeStrap under Wipe.
 
-5.9. Done, reboot the device
+5.8 Done, reboot the device
 
 The first time LineageOS starts, it will take several minutes to boot.
