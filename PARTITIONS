@@ -18,7 +18,7 @@ The following eMMC partitions are reserved for droid4-kexecboot use:
 NAME		PARTITION	NOTES
 mmcblk1p8	utags		512K device specific custom tags
 mmcblk1p9	logo.bin	2M log partition, can be changed
-mmcblk1p23	bpsw		4M empty, droid4-kexecboot rootfs
+mmcblk1p13	bpsw		4M empty, droid4-kexecboot rootfs
 mmcblk1p22	preinstall	608M ext3 tutorials, usable as auxdata
 
 The utags and bpsw partitions are always used by droid4-kexecboot
