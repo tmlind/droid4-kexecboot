@@ -3,7 +3,9 @@ when the device is booting.
 
 instead of motorola logo im replace it with maemo-leste logo
 
-im suggest it to execute using fastboot from your host machine, so type this
+im suggest it to execute using fastboot from your host machine,
+
+so type this
 
 # fastboot flash logo.bin logo.bin
 # fastboot reboot
