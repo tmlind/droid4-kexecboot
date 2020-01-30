@@ -270,9 +270,8 @@ you need to do a "factory reset" on the device in SafeStrap under Wipe.
 
 The first time LineageOS starts, it will take several minutes to boot.
 
-Additional Note: If you try install LOS14 Using webtop partition,
-		and get black screen after chosee on kexecboot.
-		go to safestrap recovery again check if your webtop partition 
-
-		(mmmcblk1p23 is ext3 partition type. and the mmcblk1p25 is vfat)
-		you can check by type "blkid"
+Note: If you try install LOS14 Using webtop partition,
+	and get black screen after chosee on kexecboot.
+	go to safestrap recovery again check if your webtop partition 
+	(mmmcblk1p23 is ext3 partition type. and the mmcblk1p25 is vfat)
+	you can check by type "blkid"
