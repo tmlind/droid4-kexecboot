@@ -148,7 +148,7 @@ for LineageOS to start. Note that if you've used your device before,
 there's no need for this. Also note that the following will wipe your
 userdata on the device:
 
-# mkte2fs -T ext4 /dev/block/mmcblk1p24
+# mke2fs -T ext4 /dev/block/mmcblk1p24
 
 5.2 Optionally reformat mmcblk1p25 emstorage partition as ext4
 
@@ -156,7 +156,7 @@ Based on your needs as described in the PARTITIONS file, optionally
 reformat mmcblk1p25 emstorage partition as ext4. This currently cannot
 be done if using mmcblk1p23 webtop for LineageOS, and mmcblk1p25 emstorage
 must be formatted vfat for that. For LineageOS on mmcblk1p23 webtop
-partition, skip to 5.4.
+partition, skip to 5.3.
 
 $ adb shell
 # mke2fs -T ext4 /dev/block/mmcblk1p25
@@ -220,7 +220,11 @@ EOF
 
 Or if booting to mmcblk1p23 webtop altpart:
 
-# cat > /system/boot/boot.cfg << EOF
+$ adb shell
+# mkdir webtop
+# mount /dev/block/mmcblk1p23 /webtop
+# mkdir /webtop/boot
+# cat > /webtop/boot/boot.cfg << EOF
 LABEL=LineageOS on mmcblk1p23 webtop partition
 PRIORITY=7
 DTB=/etc/kexec/devtree
