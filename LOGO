@@ -1,4 +1,6 @@
-oke here im just want to share about bootlogo/splashscreen when the device is booting.
+oke here im just want to share about bootlogo/splashscreen
+when the device is booting.
+
 instead of motorola logo im replace it with maemo-leste logo
 
 im suggest it to execute using fastboot from your host machine, so type this
@@ -21,9 +23,10 @@ Gimp: select Colors > Components > Channel Mixer
 Photoshop: select Image > Adjustments > Channel Mixer
 
 select Output channel:
-	- Red and change the red value from 100 to 0 and the blue value from 0 to 100
+- Red and change the red value from 100 to 0 and the blue value from 0 to 100
 now select Output channel:
-	- Blue and change the red value from 0 to 100 and the blue value from 100 to 0
+- Blue and change the red value from 0 to 100 and the blue value from 100 to 0
+
 hit OK
 
 Note: the colors will look strange but will display properly on the phone
