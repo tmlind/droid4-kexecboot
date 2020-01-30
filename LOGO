@@ -1,0 +1,48 @@
+oke here im just want to share about bootlogo/splashscreen
+when the device is booting.
+
+instead of motorola logo im replace it with maemo-leste logo
+
+im suggest it to execute using fastboot from your host machine,
+
+so type this
+
+# fastboot flash logo.bin logo.bin
+# fastboot reboot
+
+and see the different.
+
+and if you want to create with another picture
+here the guide
+
+instructions are essentially the same for gimp and photoshop:
+
+create a 540x540 image
+merge into one layer
+
+Gimp: select Colors > Components > Channel Mixer
+
+Photoshop: select Image > Adjustments > Channel Mixer
+
+select Output channel:
+- Red and change the red value from 100 to 0 and the blue value from 0 to 100
+now select Output channel:
+- Blue and change the red value from 0 to 100 and the blue value from 100 to 0
+
+hit OK
+
+Note: the colors will look strange but will display properly on the phone
+
+Gimp: select file > export
+name "logo.bin"
+select "all files" from dropdown menu
+expand the "select file type (by extension)" menu and select "raw image data"
+export
+
+Photoshop: select file > save as
+name "logo.bin"
+format "photoshop raw"
+save
+
+
+Thanks to p3droid and TBH!
