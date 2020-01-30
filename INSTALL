@@ -165,19 +165,24 @@ There is no need to use any special ext4 flags above as the SafeStrap
 recovery is using the stock v3.0.8 kernel that does not understand the
 newer flags.
 
-note: if you came from LOS14 using Stock partition (mmcblk1p20) then you need to reformat mmcblk1p25 to vfat
+note: if you came from LOS14 using Stock partition (mmcblk1p20)
+then you need to reformat mmcblk1p25 to vfat
+
 how to do it, its little bit tricky
 
 first back to firmware folder (VRZ_XT894_9.8.2O-72_VZW-18-8_CFC.xml.zip)
-then flash emstorage to the device, because mke2fs cannot format partition to vfat.
+then flash emstorage to the device, because mke2fs cannot format partition
+to vfat.
 
 type:
 
 host@user# fastboot flash emstorage emstorage.img
 
-now there's a problem, if you see on safestrap recovery, the Internal storage free Space is just 25Mb
+now there's a problem, if you see on safestrap recovery,
+the Internal storage free Space is just 25Mb
 
-to get back the rest, you cannot just format using safestrap recovery, it will cause the internal a.k.a (/sdcard on safestrap recovery)
+to get back the rest, you cannot just format using safestrap recovery,
+it will cause the internal a.k.a (/sdcard on safestrap recovery)
 not mount.
 
 to format it. go to Mount menu on safestrap, then Mount USB Storage
@@ -205,7 +210,7 @@ On the device, select "Boot Options" -> "Stock ROM" -> "Activate" if not
 already active. After setting it, red "ROM SLot: stock" should display on
 the top of the screen
 
-if you gona install to webtop partition, select "Boot Options" -> "Webtop -> System" -> "Activate"
+for webtop, select "Boot Options" -> "Webtop -> System" -> "Activate"
 then you see on the top left corner ROM Slot: altpart
 
 5.5 Install LineageOS with adb sideload
@@ -265,6 +270,9 @@ you need to do a "factory reset" on the device in SafeStrap under Wipe.
 
 The first time LineageOS starts, it will take several minutes to boot.
 
-Additional Note: If you try install LOS14 Using webtop partition, and get black screen after chosee on kexecboot.
-go to safestrap recovery again check if your webtop partition (mmmcblk1p23 is ext3 partition type. and the mmcblk1p25 is vfat)
-you can check by type "blkid"
+Additional Note: If you try install LOS14 Using webtop partition,
+		and get black screen after chosee on kexecboot.
+		go to safestrap recovery again check if your webtop partition 
+
+		(mmmcblk1p23 is ext3 partition type. and the mmcblk1p25 is vfat)
+		you can check by type "blkid"
