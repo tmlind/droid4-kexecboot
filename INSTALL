@@ -148,7 +148,7 @@ for LineageOS to start. Note that if you've used your device before,
 there's no need for this. Also note that the following will wipe your
 userdata on the device:
 
-# mkte2fs -T ext4 /dev/block/mmcblk1p24
+# mke2fs -T ext4 /dev/block/mmcblk1p24
 
 5.2 Optionally reformat mmcblk1p25 emstorage partition as ext4
 
@@ -156,7 +156,7 @@ Based on your needs as described in the PARTITIONS file, optionally
 reformat mmcblk1p25 emstorage partition as ext4. This currently cannot
 be done if using mmcblk1p23 webtop for LineageOS, and mmcblk1p25 emstorage
 must be formatted vfat for that. For LineageOS on mmcblk1p23 webtop
-partition, skip to 5.4.
+partition, skip to 5.3.
 
 $ adb shell
 # mke2fs -T ext4 /dev/block/mmcblk1p25
@@ -164,6 +164,25 @@ $ adb shell
 There is no need to use any special ext4 flags above as the SafeStrap
 recovery is using the stock v3.0.8 kernel that does not understand the
 newer flags.
+
+note: if you came from LOS14 using Stock partition (mmcblk1p20) then you need to reformat mmcblk1p25 to vfat
+how to do it, its little bit tricky
+
+first back to firmware folder (VRZ_XT894_9.8.2O-72_VZW-18-8_CFC.xml.zip)
+then flash emstorage to the device, because mke2fs cannot format partition to vfat.
+
+type:
+
+host@user# fastboot flash emstorage emstorage.img
+
+now there's a problem, if you see on safestrap recovery, the Internal storage free Space is just 25Mb
+
+to get back the rest, you cannot just format using safestrap recovery, it will cause the internal a.k.a (/sdcard on safestrap recovery)
+not mount.
+
+to format it. go to Mount menu on safestrap, then Mount USB Storage
+on your host machien you will se new partition 25mb free of 8gb.
+just format it using file manager. to fat32 and it will be back 8gb free.
 
 5.3 Configure mmcblk1p25 emstorage partition active_slot file
 
@@ -185,6 +204,9 @@ on boot.
 On the device, select "Boot Options" -> "Stock ROM" -> "Activate" if not
 already active. After setting it, red "ROM SLot: stock" should display on
 the top of the screen
+
+if you gona install to webtop partition, select "Boot Options" -> "Webtop -> System" -> "Activate"
+then you see on the top left corner ROM Slot: altpart
 
 5.5 Install LineageOS with adb sideload
 
@@ -220,7 +242,10 @@ EOF
 
 Or if booting to mmcblk1p23 webtop altpart:
 
-# cat > /system/boot/boot.cfg << EOF
+$ adb shell
+# mkdir pre
+# mount /dev/block/mmcblk1p23 /pre
+# cat > /pre/boot/boot.cfg << EOF
 LABEL=LineageOS on mmcblk1p23 webtop partition
 PRIORITY=7
 DTB=/etc/kexec/devtree
@@ -239,3 +264,7 @@ you need to do a "factory reset" on the device in SafeStrap under Wipe.
 5.8 Done, reboot the device
 
 The first time LineageOS starts, it will take several minutes to boot.
+
+Additional Note: If you try install LOS14 Using webtop partition, and get black screen after chosee on kexecboot.
+go to safestrap recovery again check if your webtop partition (mmmcblk1p23 is ext3 partition type. and the mmcblk1p25 is vfat)
+you can check by type "blkid"
