@@ -132,6 +132,8 @@ $ adb shell
 # mount /dev/block/mmcblk1p20 /system
 # mkdir -p /preinstall/lib/modules/3.0.8-stock
 # cp /system/lib/modules/* /preinstall/lib/modules/3.0.8-stock/
+# mkdir -p /preinstall/lib/firmware/3.0.8-stock
+# cp /system/etc/firmware/ti-connectivity/* /preinstall/lib/firmware/3.0.8-stock/
 # umount /system
 # umount /preinstall
 
